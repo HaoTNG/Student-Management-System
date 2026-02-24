@@ -2,8 +2,9 @@
 
 ## 📚 Thông Tin Nhóm
 
-| STT | Họ và Tên        | MSSV    | 
-| 1   | Nguyễn Trọng Hào | 2310854 | 
+| STT | Họ và Tên        | MSSV    | Ghi Chú |
+|-----|-----------       |------|---------|
+| 1   | Nguyễn Trọng Hào | 2310854 | |
 
 
 ## 📖 Lab 1: Khởi Tạo & Kiến Trúc Hệ Thống
@@ -327,5 +328,6 @@ Nếu gặp vấn đề:
 
 ---
 
-
+**Repository**: [Public URL sẽ được cập nhật ở Lab 5]  
+**Ngôn Ngữ Triển Khai**: Sẽ được cập nhật ở Lab 5  
 **Deploy URL**: Sẽ được cập nhật ở Lab 5
