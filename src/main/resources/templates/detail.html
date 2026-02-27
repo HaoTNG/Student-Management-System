@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi Tiết Sinh Viên</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 24px;
+        }
+
+        .subtitle {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .info-group {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+        }
+
+        .info-label {
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            color: #333;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .status-adult {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-underage {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        button, a {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-edit {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #5568d3;
+        }
+
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #c0392b;
+        }
+
+        .btn-back {
+            background: #ccc;
+            color: #333;
+        }
+
+        .btn-back:hover {
+            background: #bbb;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #999;
+            font-size: 12px;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-content p {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 10px;
+            font-size: 12px;
+        }
+
+        .btn-confirm {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-confirm:hover {
+            background: #c0392b;
+        }
+
+        .btn-cancel-modal {
+            background: #ccc;
+            color: #333;
+        }
+
+        .btn-cancel-modal:hover {
+            background: #bbb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1 th:text="${student.name}">Student Name</h1>
+                <p class="subtitle">Chi Tiết Thông Tin</p>
+            </div>
+        </div>
+
+        <!-- Student Information -->
+        <div class="info-group">
+            <div class="info-label">Mã Sinh Viên (ID)</div>
+            <div class="info-value" th:text="${student.id}">ID</div>
+        </div>
+
+        <div class="info-group">
+            <div class="info-label">Họ và Tên</div>
+            <div class="info-value" th:text="${student.name}">Name</div>
+        </div>
+
+        <div class="info-group">
+            <div class="info-label">Email</div>
+            <div class="info-value" th:text="${student.email}">Email</div>
+        </div>
+
+        <div class="info-group">
+            <div class="info-label">Tuổi</div>
+            <div class="info-value" th:text="${student.age}">Age</div>
+            <span th:class="${student.age >= 18} ? 'status-badge status-adult' : 'status-badge status-underage'">
+                <span th:if="${student.age >= 18}">✓ Đủ 18 tuổi</span>
+                <span th:unless="${student.age >= 18}">⚠ Chưa đủ 18 tuổi</span>
+            </span>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="button-group">
+            <a th:href="@{/students/{id}/edit(id=${student.id})}" class="btn-edit">✏️ Chỉnh Sửa</a>
+            <button type="button" class="btn-delete" onclick="openDeleteModal()">🗑️ Xóa</button>
+        </div>
+
+        <div class="button-group">
+            <a href="/students" class="btn-back">← Quay Lại Danh Sách</a>
+        </div>
+
+        <div class="footer">
+            <p>Advanced Software Engineering - Lab 4 - Detail View</p>
+            <p>HCMC University of Technology | Faculty of Computer Science and Engineering</p>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <p>⚠️ Bạn có chắc chắn muốn xóa sinh viên này?</p>
+            <p style="font-weight: bold; color: #667eea;" th:text="${student.name}"></p>
+            <p style="font-size: 12px; color: #999;">Hành động này không thể hoàn tác.</p>
+            <div class="modal-buttons">
+                <button type="button" class="btn-confirm" onclick="confirmDelete()">Xóa</button>
+                <button type="button" class="btn-cancel-modal" onclick="closeDeleteModal()">Hủy</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'block';
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+
+        function confirmDelete() {
+            // Submit delete request
+            const studentId = document.querySelector('.info-value').textContent;
+            window.location.href = '/students/delete?id=' + document.querySelector('[th\\:text*="student.id"]')?.getAttribute('th:text') || new URLSearchParams(window.location.search).get('id');
+            
+            // Alternative: use the ID from the URL or data attribute
+            const id = window.location.pathname.split('/').pop();
+            if (id && id !== 'detail') {
+                fetch('/students/delete?id=' + id, { method: 'GET' })
+                    .then(() => window.location.href = '/students')
+                    .catch(e => console.error('Error:', e));
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('deleteModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -318,6 +318,426 @@ spring.jpa.hibernate.ddl-auto=validate
 - Tạo Controller `StudentController`
 - Implement CRUD API
 
+---
+
+## 📖 Lab 2: Xây Dựng Backend REST API
+
+### 🎯 Mục Tiêu Lab 2
+- ✅ Hiện thực hóa Entity, Repository, Service, Controller
+- ✅ Xây dựng API phục vụ truy vấn dữ liệu (Read-only)
+- ✅ Kiểm thử REST API
+
+### 📋 Thành Phần Đã Thực Hiện
+
+#### 1. **Entity Layer** - `Student.java`
+```java
+@Entity
+@Table(name = "students")
+public class Student {
+    @Id
+    private String id;  // String ID (manual management)
+    private String name;
+    private String email;
+    private int age;
+    // Getters, Setters, Constructors
+}
+```
+
+#### 2. **Repository Layer** - `StudentRepository.java`
+```java
+@Repository
+public interface StudentRepository extends JpaRepository<Student, String> {
+    // Spring Data JPA automatically implements CRUD operations
+}
+```
+
+#### 3. **Service Layer** - `StudentService.java`
+```java
+@Service
+public class StudentService {
+    @Autowired
+    private StudentRepository repository;
+    
+    public List<Student> getAll() {
+        return repository.findAll();
+    }
+    
+    public Student getById(String id) {
+        return repository.findById(id).orElse(null);
+    }
+}
+```
+
+#### 4. **Controller Layer** - `StudentController.java`
+```java
+@RestController
+@RequestMapping("/api/students")
+public class StudentController {
+    @Autowired
+    private StudentService service;
+    
+    @GetMapping
+    public List<Student> getAllStudents() {
+        return service.getAll();
+    }
+    
+    @GetMapping("/{id}")
+    public Student getStudentById(@PathVariable String id) {
+        return service.getById(id);
+    }
+}
+```
+
+#### 5. **Data Loader** - `DataLoader.java`
+- Tự động load 12 sinh viên mẫu khi ứng dụng khởi động
+- Implements `CommandLineRunner` interface
+
+### 📌 API Specification
+
+| Chức Năng | Method | Endpoint | Request Body | Response |
+|-----------|--------|----------|--------------|----------|
+| Lấy danh sách | GET | `/api/students` | - | `List<Student>` (JSON) |
+| Lấy chi tiết | GET | `/api/students/{id}` | - | `Student` (JSON) |
+
+### 🧪 Kiểm Thử API
+
+#### Test 1: Get All Students
+```bash
+curl http://localhost:8080/api/students
+```
+
+**Kết quả mong đợi:**
+```json
+[
+  {
+    "id": "1",
+    "name": "Nguyen Van A",
+    "email": "vana@example.com",
+    "age": 20
+  },
+  {
+    "id": "2",
+    "name": "Tran Thi B",
+    "email": "thib@example.com",
+    "age": 21
+  }
+  // ... 10 more students
+]
+```
+
+#### Test 2: Get Student by ID
+```bash
+curl http://localhost:8080/api/students/1
+```
+
+**Kết quả mong đợi:**
+```json
+{
+  "id": "1",
+  "name": "Nguyen Van A",
+  "email": "vana@example.com",
+  "age": 20
+}
+```
+
+#### Test 3: Get Non-Existent Student
+```bash
+curl http://localhost:8080/api/students/999
+```
+
+**Kết quả mong đợi:** `null` (hoặc empty response)
+
+### 🏗️ Kiến Trúc Cải Thiện (Dependency Injection)
+
+**Trước (Tightly Coupled):**
+```java
+StudentService service = new StudentService();  // ❌ Manual instantiation
+```
+
+**Sau (Loosely Coupled - Dependency Injection):**
+```java
+@Autowired
+private StudentService service;  // ✅ Spring automatically injects
+```
+
+**Lợi ích:**
+- Dễ viết Unit Test (có thể mock dependencies)
+- Dễ thay đổi implementation
+- Quản lý lifecycle tự động
+
+### 📊 Database Schema Update
+
+```sql
+CREATE TABLE students (
+    age integer not null,
+    email varchar(255),
+    id varchar(255) not null,
+    name varchar(255),
+    primary key (id)
+);
+```
+
+**Thay đổi từ Lab 1:**
+- ❌ `id INTEGER PRIMARY KEY` (Lab 1)
+- ✅ `id VARCHAR(255) PRIMARY KEY` (Lab 2) - hỗ trợ String IDs
+
+### 🔧 Annotation Giải Thích
+
+| Annotation | Vị Trí | Công Dụng |
+|-----------|--------|----------|
+| `@Entity` | Class Student | Đánh dấu class ánh xạ với table |
+| `@Table` | Class Student | Chỉ định tên table |
+| `@Id` | Field id | Chỉ định primary key |
+| `@Repository` | Interface StudentRepository | Đánh dấu Data Access Layer |
+| `@Service` | Class StudentService | Đánh dấu Business Logic Layer |
+| `@RestController` | Class StudentController | Đánh dấu REST API Controller |
+| `@RequestMapping` | Class StudentController | Định nghĩa base URL path |
+| `@GetMapping` | Method | Ánh xạ HTTP GET request |
+| `@PathVariable` | Parameter | Trích xuất giá trị từ URL path |
+| `@Autowired` | Field | Dependency Injection |
+
+### 📝 Ghi Chú Quan Trọng
+
+1. **Dependency Injection Pattern:**
+   - Spring Container quản lý lifecycle của beans
+   - `@Autowired` tự động inject dependencies
+   - Giảm coupling, dễ test
+
+2. **Dynamic Proxy (Spring Data JPA):**
+   - StudentRepository là interface, không có class implementation
+   - Spring tự động tạo implementation class lúc runtime
+   - CRUD operations được tự động generate
+
+3. **Data Loading:**
+   - `DataLoader` tự động chạy sau startup
+   - Kiểm tra database có dữ liệu chưa trước khi load
+   - Tránh duplicate data
+
+4. **API Response:**
+   - Tất cả responses được convert thành JSON tự động
+   - `@RestController` = `@Controller` + `@ResponseBody`
+
+### 🚀 Lab 3: Frontend - Server-Side Rendering (SSR)
+
+### 🎯 Mục Tiêu
+- ✅ Hiểu mô hình MVC (Model-View-Controller)
+- ✅ Cấu hình và sử dụng Thymeleaf Template Engine
+- ✅ Xây dựng Server-Side Rendering (SSR)
+- ✅ Thêm chức năng tìm kiếm
+
+### 📋 Mô Tả Lab 3
+
+Ở Lab 2 chúng ta đã xây dựng REST API trả về JSON. Ở Lab 3, chúng ta sẽ:
+1. Thêm Thymeleaf Template Engine để tạo HTML động
+2. Tạo Web Controller (khác với REST Controller)
+3. Xây dựng HTML template hiển thị danh sách sinh viên
+4. Thêm tính năng tìm kiếm (search)
+
+### 🏗️ Kiến Trúc MVC (Model-View-Controller)
+
+```
+Browser Request (/students)
+    ↓
+StudentWebController (@Controller)
+  ├─ Nhận request từ /students
+  ├─ Gọi StudentService để lấy dữ liệu
+  ├─ Đóng gói data vào Model
+  └─ Return "students" (tên view)
+    ↓
+Thymeleaf Template Engine
+  ├─ Đọc students.html
+  ├─ Thay thế ${dsSinhVien} bằng dữ liệu thực
+  ├─ Render HTML đầy đủ
+  └─ Return HTML to Browser
+    ↓
+Browser nhận HTML hoàn chỉnh
+  └─ Hiển thị bảng sinh viên ngay lập tức
+```
+
+### ✨ Tính Năng Chính (Lab 3)
+
+| Tính Năng | Mô Tả | Status |
+|-----------|-------|--------|
+| Thymeleaf Integration | Template Engine cho SSR | ✅ |
+| StudentWebController | Web Controller (@Controller) | ✅ |
+| students.html | View template với Thymeleaf syntax | ✅ |
+| Search Form | Tìm kiếm theo tên hoặc email | ✅ |
+| Data Binding | Hiển thị dữ liệu động từ Backend | ✅ |
+| CSS Styling | Giao diện đẹp và responsive | ✅ |
+| Status Badges | Hiển thị trạng thái tuổi (≥18) | ✅ |
+| Statistics | Hiển thị tổng sinh viên & tuổi trung bình | ✅ |
+
+### 📝 Thymeleaf Syntax
+
+**1. Variable Expression - Biến từ Controller**
+```html
+<!-- In giá trị của biến -->
+<td th:text="${student.name}">Tên mẫu</td>
+<!-- Kết quả: <td>Nguyen Van A</td> -->
+```
+
+**2. Loop - Lặp qua danh sách**
+```html
+<!-- Với mỗi student trong dsSinhVien -->
+<tr th:each="student : ${dsSinhVien}">
+    <td th:text="${student.id}">ID</td>
+    <td th:text="${student.name}">Name</td>
+</tr>
+```
+
+**3. Conditional - Điều kiện**
+```html
+<!-- Nếu tuổi >= 18 -->
+<span th:if="${student.age >= 18}">✓ Đủ 18</span>
+<!-- Nếu tuổi < 18 -->
+<span th:unless="${student.age >= 18}">⚠ Chưa 18</span>
+```
+
+**4. Dynamic Class - Thêm class động**
+```html
+<!-- Nếu tuổi < 18, thêm class 'text-danger' -->
+<tr th:class="${student.age < 18} ? 'text-danger' : ''">
+```
+
+**5. Form Binding - Liên kết với form**
+```html
+<!-- Giữ giá trị tìm kiếm trong input -->
+<input type="text" name="keyword" th:value="${keyword}" />
+```
+
+### 🚀 Cách Chạy Lab 3
+
+1. **Khởi động ứng dụng:**
+```bash
+./mvnw spring-boot:run
+```
+
+2. **Truy cập giao diện:**
+```
+http://localhost:8080/students
+```
+
+3. **Tìm kiếm:**
+```
+http://localhost:8080/students?keyword=Nguyen
+http://localhost:8080/students?keyword=vana@example.com
+```
+
+4. **Test tất cả tính năng:**
+```bash
+chmod +x test_lab3_ssr.sh
+./test_lab3_ssr.sh
+```
+
+### 📊 Kết Quả Test (Lab 3)
+
+✅ **14 Test Cases - ALL PASS**
+
+| Test | Status | Mô Tả |
+|------|--------|-------|
+| Display all students | ✅ | GET /students renders 12 students |
+| Page title | ✅ | "Danh Sach Sinh Vien" visible |
+| Student in table | ✅ | All 12 students visible in table |
+| Search by name | ✅ | keyword=Hoang returns 1 result |
+| Search by email | ✅ | keyword=vana returns 1 result |
+| Filter results | ✅ | Non-matching students filtered |
+| Search indicator | ✅ | Shows search results message |
+| HTML table | ✅ | Table, thead, tbody present |
+| Thymeleaf namespace | ✅ | xmlns:th declared |
+| CSS gradient | ✅ | Background styling applied |
+| Font family | ✅ | Typography defined |
+| Age badges | ✅ | Status indicators working |
+| Clear search | ✅ | Reset returns to all students |
+| Average age | ✅ | Statistics calculated correctly |
+
+### 🔄 REST API vs SSR So Sánh
+
+| Đặc Điểm | Lab 2 (REST) | Lab 3 (SSR) |
+|---------|-------------|-----------|
+| Controller | @RestController | @Controller |
+| Response | JSON data | HTML page |
+| Rendering | Client-side (JS) | Server-side (Thymeleaf) |
+| URL | /api/students | /students |
+| Template | N/A | students.html |
+| Format | Raw JSON | HTML table |
+| Tìm kiếm | N/A | Form submission |
+| SEO | Kém | Tốt |
+| First Load | JSON only | Complete HTML |
+
+### 📁 File Structure (Lab 3)
+
+```
+src/main/java/vn/edu/hcmut/cse/adse/lab/
+├── StudentManagementApplication.java
+├── DataLoader.java
+├── controller/
+│   ├── StudentController.java       (Lab 2 - REST)
+│   └── StudentWebController.java    (Lab 3 - SSR) ← NEW
+├── service/
+│   └── StudentService.java          (+ searchByName method)
+├── repository/
+│   └── StudentRepository.java
+└── entity/
+    └── Student.java
+
+src/main/resources/
+├── application.properties
+├── templates/                        ← NEW DIRECTORY
+│   └── students.html                ← NEW FILE
+├── static/
+└── ...
+
+root/
+├── pom.xml                          (+ thymeleaf dependency)
+└── ...
+```
+
+### 💡 Khái Niệm Chính Lab 3
+
+1. **Server-Side Rendering (SSR)**
+   - Template engine xử lý trên server
+   - Gửi HTML hoàn chỉnh tới browser
+   - Tốt hơn cho SEO
+   - Nhanh hơn initial load
+
+2. **MVC Architecture**
+   - Model: Dữ liệu (Student list)
+   - View: Template (students.html)
+   - Controller: Logic (StudentWebController)
+
+3. **Template Engine (Thymeleaf)**
+   - XML-based syntax
+   - Natural templates (valid HTML)
+   - Hỗ trợ expressions, loops, conditions
+   - No external dependencies for view files
+
+4. **Search Implementation**
+   - @RequestParam để lấy query parameter
+   - Stream API để filter dữ liệu
+   - Case-insensitive matching
+   - Multi-field search (name + email)
+
+### 🎓 Learning Outcomes
+
+Sau Lab 3, bạn sẽ hiểu:
+- ✅ Mô hình MVC là gì
+- ✅ Khác biệt giữa REST API và SSR
+- ✅ Cách sử dụng Thymeleaf
+- ✅ Cách implement search/filter
+- ✅ Model Object để truyền dữ liệu
+- ✅ Conditional rendering trong template
+
+---
+
+### 🚀 Lab Tiếp Theo (Lab 4)
+Ở Lab 4, chúng ta sẽ:
+- Thêm chức năng POST (tạo sinh viên)
+- Thêm chức năng PUT (cập nhật sinh viên)
+- Thêm chức năng DELETE (xóa sinh viên)
+- Migrate database từ SQLite sang PostgreSQL
+
+---
+
 ### 📞 Hỗ Trợ & Liên Hệ
 
 Nếu gặp vấn đề:
@@ -325,9 +745,11 @@ Nếu gặp vấn đề:
 2. Kiểm tra Maven: `./mvnw -version`
 3. Xóa folder `target` và `~/.m2/repository` rồi rebuild: `./mvnw clean install`
 4. Kiểm tra SQLite file: `sqlite3 student.db ".tables"`
+5. Xem chi tiết: `LAB3_COMPLETION_NOTES.md`
 
 ---
 
 **Repository**: [Public URL sẽ được cập nhật ở Lab 5]  
 **Ngôn Ngữ Triển Khai**: Sẽ được cập nhật ở Lab 5  
 **Deploy URL**: Sẽ được cập nhật ở Lab 5
+

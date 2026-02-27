@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh Sach Sinh Vien</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .search-section {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-section form {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .search-section input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .search-section input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+
+        .search-section button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .search-section button:hover {
+            background: #5568d3;
+        }
+
+        .clear-btn {
+            padding: 10px 20px;
+            background: #ccc;
+            color: #333;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .clear-btn:hover {
+            background: #bbb;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            color: #333;
+            font-weight: 600;
+            text-align: left;
+            padding: 12px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        .text-danger {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-adult {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-underage {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+            font-size: 16px;
+        }
+
+        .stats {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #999;
+            font-size: 12px;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+
+        .active-search {
+            background-color: #fff3cd;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .active-search span {
+            color: #856404;
+        }
+
+        .add-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            transition: background 0.3s;
+        }
+
+        .add-btn:hover {
+            background: #218838;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        .btn-view, .btn-edit, .btn-delete {
+            padding: 5px 10px;
+            text-decoration: none;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+
+        .btn-view {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-view:hover {
+            opacity: 0.8;
+        }
+
+        .btn-edit {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-edit:hover {
+            opacity: 0.8;
+        }
+
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Danh Sach Sinh Vien</h1>
+        <p class="subtitle">Quản lý Sinh Viên - Lab 4 CRUD Operations</p>
+
+        <!-- Add New Button -->
+        <a href="/students/create" class="add-btn">➕ Thêm Mới Sinh Viên</a>
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <form action="/students" method="GET">
+                <input type="text" name="keyword" placeholder="Nhap ten hoac email..." th:value="${keyword}" />
+                <button type="submit">🔍 Tim</button>
+            </form>
+            <th:block th:if="${keyword} and ${keyword != ''}">
+                <a href="/students" class="clear-btn">Xoa Tim Kiem</a>
+            </th:block>
+        </div>
+
+        <!-- Active Search Indicator -->
+        <th:block th:if="${keyword} and ${keyword != ''}">
+            <div class="active-search">
+                <span>🔎 Ket qua tim kiem cho: <strong th:text="${keyword}"></strong></span>
+                <span th:text="'(' + ${#lists.size(dsSinhVien)} + ' ket qua)'"></span>
+            </div>
+        </th:block>
+
+        <!-- Students Table -->
+        <table th:if="${dsSinhVien.size() > 0}">
+            <thead>
+                <tr>
+                    <th style="width: 8%;">ID</th>
+                    <th style="width: 25%;">Ho va Ten</th>
+                    <th style="width: 30%;">Email</th>
+                    <th style="width: 10%;">Tuoi</th>
+                    <th style="width: 10%;">Trang Thai</th>
+                    <th style="width: 17%;">Hanh Dong</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="student : ${dsSinhVien}" th:class="${student.age < 18} ? 'text-danger' : ''">
+                    <td th:text="${student.id}">ID</td>
+                    <td th:text="${student.name}">Ten</td>
+                    <td th:text="${student.email}">Email</td>
+                    <td th:text="${student.age}">0</td>
+                    <td>
+                        <span class="status-badge" th:class="${student.age >= 18} ? 'status-badge status-adult' : 'status-badge status-underage'">
+                            <span th:if="${student.age >= 18}">✓ Đủ 18</span>
+                            <span th:unless="${student.age >= 18}">⚠ Chưa 18</span>
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <a th:href="@{/students/{id}(id=${student.id})}" class="btn-view">👁️ Xem</a>
+                            <a th:href="@{/students/{id}/edit(id=${student.id})}" class="btn-edit">✏️ Sửa</a>
+                            <a th:href="@{/students/delete(id=${student.id})}" class="btn-delete" onclick="return confirm('Bạn có chắc chắn muốn xóa?');">🗑️ Xóa</a>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Empty Message -->
+        <div class="empty-message" th:unless="${dsSinhVien.size() > 0}">
+            <p>❌ Khong tim thay sinh vien nao</p>
+            <p style="margin-top: 10px; font-size: 12px;">Vui long thu lai voi tieu chi khac</p>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats" th:if="${dsSinhVien.size() > 0}">
+            <strong>Thong ke:</strong>
+            <span th:text="'Tong: ' + ${#lists.size(dsSinhVien)} + ' sinh vien'"></span>
+            |
+            <span th:text="'Trung binh tuoi: ' + ${#aggregates.avg(dsSinhVien.![age])}"></span>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Advanced Software Engineering - Lab 4</p>
+            <p>HCMC University of Technology | Faculty of Computer Science and Engineering</p>
+        </div>
+    </div>
+</body>
+</html>

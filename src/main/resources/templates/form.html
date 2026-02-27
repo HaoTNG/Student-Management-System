@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${student != null ? 'Chỉnh Sửa Sinh Viên' : 'Thêm Mới Sinh Viên'}">Form</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .subtitle {
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+
+        .error {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .form-info {
+            background-color: #f9f9f9;
+            padding: 12px;
+            border-left: 4px solid #667eea;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .btn-save {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-save:hover {
+            background: #5568d3;
+        }
+
+        .btn-cancel {
+            background: #ccc;
+            color: #333;
+        }
+
+        .btn-cancel:hover {
+            background: #bbb;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #999;
+            font-size: 12px;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 th:text="${student != null ? 'Chỉnh Sửa Sinh Viên' : 'Thêm Mới Sinh Viên'}">Form</h1>
+        <p class="subtitle">Điền thông tin đầy đủ để hoàn tất</p>
+
+        <!-- Notification Area -->
+        <div th:if="${#request.getAttribute('errors') != null}" style="background-color: #f8d7da; color: #721c24; padding: 12px; border-radius: 4px; margin-bottom: 20px;">
+            <strong>⚠️ Lỗi Validation:</strong>
+            <ul style="margin-top: 8px; margin-left: 20px;">
+                <li th:each="error : ${errors}"><span th:text="${error}"></span></li>
+            </ul>
+        </div>
+
+        <form method="POST" th:action="${student != null ? '/students/edit' : '/students/create'}">
+            <!-- Hidden ID field (only for edit) -->
+            <input type="hidden" name="id" th:field="*{student?.id}" th:if="${student != null}" />
+
+            <!-- Student Name -->
+            <div class="form-group">
+                <label for="name">Họ và Tên <span style="color: red;">*</span></label>
+                <input type="text" id="name" name="name" placeholder="Nhập họ tên sinh viên" 
+                       th:value="${student != null ? student.name : ''}" required />
+                <div class="error" th:if="${nameError}" th:text="${nameError}"></div>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+                <label for="email">Email <span style="color: red;">*</span></label>
+                <input type="email" id="email" name="email" placeholder="Nhập email (ví dụ: student@example.com)" 
+                       th:value="${student != null ? student.email : ''}" required />
+                <div class="error" th:if="${emailError}" th:text="${emailError}"></div>
+                <div class="form-info">💡 Email phải có định dạng hợp lệ (example@domain.com)</div>
+            </div>
+
+            <!-- Age -->
+            <div class="form-group">
+                <label for="age">Tuổi <span style="color: red;">*</span></label>
+                <input type="number" id="age" name="age" placeholder="Nhập tuổi (1-100)" 
+                       min="1" max="100" th:value="${student != null ? student.age : ''}" required />
+                <div class="error" th:if="${ageError}" th:text="${ageError}"></div>
+                <div class="form-info">💡 Tuổi phải nằm trong khoảng 1-100</div>
+            </div>
+
+            <!-- Hidden ID display (for edit mode) -->
+            <div class="form-info" th:if="${student != null}">
+                <strong>ID Sinh Viên:</strong> <span th:text="${student.id}"></span> (Không thể thay đổi)
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="button-group">
+                <button type="submit" class="btn-save">
+                    <span th:if="${student != null}">💾 Cập Nhật</span>
+                    <span th:unless="${student != null}">➕ Thêm Mới</span>
+                </button>
+                <button type="button" class="btn-cancel" onclick="window.history.back()">❌ Hủy</button>
+            </div>
+        </form>
+
+        <div class="footer">
+            <p>Advanced Software Engineering - Lab 4 - CRUD Operations</p>
+            <p>HCMC University of Technology | Faculty of Computer Science and Engineering</p>
+        </div>
+    </div>
+</body>
+</html>
