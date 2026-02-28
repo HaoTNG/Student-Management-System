@@ -12,13 +12,10 @@
 ## 🌐 Public URL
 
 **Web Service đã deploy:**
-```
-https://student-management-api-xxxxx.onrender.com
-```
+https://student-management-system-cj3d.onrender.com
 
-> Thay `xxxxx` bằng tên service thực tế của bạn sau khi deploy
 
----
+
 
 ## 🚀 Hướng Dẫn Chạy Dự Án
 
@@ -97,7 +94,7 @@ docker-compose down
 
 ---
 
-## 📚 Hướng Dẫn Lab
+## 📚  Lab
 
 ### Lab 1: Xây Dựng Cơ Sở Dự Án
 
@@ -473,52 +470,32 @@ spring.datasource.password=${DB_PASSWORD:postgres}
 
 ## 📸 Screenshots - Lab 4 Modules
 
-[Thêm screenshots ở đây]
-
 ### Module 1: List Students
 > Hiển thị danh sách sinh viên với action buttons (View, Edit, Delete)
+<img width="1109" height="1196" alt="image" src="https://github.com/user-attachments/assets/0751cfd6-3b66-4a11-bb58-5766b7c75b82" />
 
 ### Module 2: Search Students
 > Tìm kiếm sinh viên theo tên hoặc email
+<img width="653" height="623" alt="image" src="https://github.com/user-attachments/assets/c195faad-45c5-4386-bef4-12974d7e76df" />
 
 ### Module 3: Create Student
 > Form thêm mới sinh viên với validation
+<img width="735" height="840" alt="image" src="https://github.com/user-attachments/assets/b1c5c700-8a52-4bc4-b790-5328ca982729" />
 
 ### Module 4: Edit Student
 > Form chỉnh sửa thông tin sinh viên
+<img width="845" height="931" alt="image" src="https://github.com/user-attachments/assets/f29b52db-2143-4b4c-9baf-672e3542d0d6" />
 
 ### Module 5: View Detail
 > Xem chi tiết thông tin một sinh viên
+![Uploading image.png…]()
 
 ### Module 6: Delete Student
 > Xác nhận trước khi xóa sinh viên
-
-### Module 7: API Response
-> Response từ REST API endpoint
-
-### Module 8: Database
-> Bảng Student trong database
+![Uploading image.png…]()
 
 ---
 
-## 🧪 Testing Checklist
-
-- [ ] Application builds successfully
-- [ ] Application runs on localhost:8080
-- [ ] Can view list of students
-- [ ] Can search students
-- [ ] Can create new student
-- [ ] Can view student detail
-- [ ] Can edit student
-- [ ] Can delete student
-- [ ] REST API endpoints respond correctly
-- [ ] Docker image builds successfully
-- [ ] Docker container runs successfully
-- [ ] Application deployed on Render
-- [ ] Database connection works on Neon
-- [ ] CI/CD auto-deploy works
-
----
 
 ## 📞 Troubleshooting
 
