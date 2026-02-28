@@ -5,8 +5,7 @@
 | STT | Thành Viên | MSSV | Vai Trò |
 |-----|-----------|------|---------|
 | 1 | Nguyễn Trọng Hào | 2310854 | Scrum Master |
-| 2 | [Tên thành viên 2] | [MSSV] | Developer |
-| 3 | [Tên thành viên 3] | [MSSV] | Developer |
+
 
 ---
 
