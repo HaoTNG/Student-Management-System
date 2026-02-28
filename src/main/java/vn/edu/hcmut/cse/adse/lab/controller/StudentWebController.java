@@ -36,10 +36,11 @@ public class StudentWebController {
     /**
      * GET /students/create
      * Show form for creating new student
+     * MUST be before /{id} routes to avoid path variable matching
      */
     @GetMapping("/create")
     public String showCreateForm(Model model) {
-        model.addAttribute("student", null);
+        model.addAttribute("student", new Student());
         return "form";
     }
 
@@ -71,22 +72,20 @@ public class StudentWebController {
     }
 
     /**
-     * GET /students/{id}
-     * Display detail view for a specific student
+     * GET /students/delete?id=xxx
+     * Delete student and redirect to list
+     * MUST be before /{id} routes to avoid path variable matching
      */
-    @GetMapping("/{id}")
-    public String getStudentDetail(@PathVariable String id, Model model) {
-        Student student = service.getById(id);
-        if (student == null) {
-            return "redirect:/students";
-        }
-        model.addAttribute("student", student);
-        return "detail";
+    @GetMapping("/delete")
+    public String deleteStudent(@RequestParam String id) {
+        service.deleteStudent(id);
+        return "redirect:/students";
     }
 
     /**
      * GET /students/{id}/edit
-     * Show edit form with existing student data
+     * Show edit form with student data pre-filled
+     * MUST be before general /{id} route
      */
     @GetMapping("/{id}/edit")
     public String showEditForm(@PathVariable String id, Model model) {
@@ -99,18 +98,17 @@ public class StudentWebController {
     }
 
     /**
-     * POST /students/edit
-     * Update existing student
+     * POST /students/{id}/edit
+     * Update student data and save to database
      */
-    @PostMapping("/edit")
+    @PostMapping("/{id}/edit")
     public String editStudent(
-            @RequestParam String id,
+            @PathVariable String id,
             @RequestParam String name,
             @RequestParam String email,
             @RequestParam int age,
             Model model) {
-        
-        // Validation
+
         List<String> errors = validateStudentData(name, email, age);
         if (!errors.isEmpty()) {
             Student student = service.getById(id);
@@ -126,13 +124,17 @@ public class StudentWebController {
     }
 
     /**
-     * GET /students/delete?id=xxx
-     * Delete student and redirect to list
+     * GET /students/{id}
+     * Display detail view for a specific student
      */
-    @GetMapping("/delete")
-    public String deleteStudent(@RequestParam String id) {
-        service.deleteStudent(id);
-        return "redirect:/students";
+    @GetMapping("/{id}")
+    public String getStudentDetail(@PathVariable String id, Model model) {
+        Student student = service.getById(id);
+        if (student == null) {
+            return "redirect:/students";
+        }
+        model.addAttribute("student", student);
+        return "detail";
     }
 
     /**

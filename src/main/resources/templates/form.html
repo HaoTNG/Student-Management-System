@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${student != null ? 'Chỉnh Sửa Sinh Viên' : 'Thêm Mới Sinh Viên'}">Form</title>
+    <title th:text="${student != null && student.id != null && student.id != '' ? 'Chỉnh Sửa Sinh Viên' : 'Thêm Mới Sinh Viên'}">Form</title>
     <style>
         * {
             margin: 0;
@@ -137,35 +137,34 @@
 </head>
 <body>
     <div class="container">
-        <h1 th:text="${student != null ? 'Chỉnh Sửa Sinh Viên' : 'Thêm Mới Sinh Viên'}">Form</h1>
+        <h1 th:text="${student != null && student.id != null && student.id != '' ? 'Chỉnh Sửa Sinh Viên' : 'Thêm Mới Sinh Viên'}">Form</h1>
         <p class="subtitle">Điền thông tin đầy đủ để hoàn tất</p>
 
         <!-- Notification Area -->
-        <div th:if="${#request.getAttribute('errors') != null}" style="background-color: #f8d7da; color: #721c24; padding: 12px; border-radius: 4px; margin-bottom: 20px;">
+        <div th:if="${errors != null and !errors.isEmpty()}" style="background-color: #f8d7da; color: #721c24; padding: 12px; border-radius: 4px; margin-bottom: 20px;">
             <strong>⚠️ Lỗi Validation:</strong>
             <ul style="margin-top: 8px; margin-left: 20px;">
                 <li th:each="error : ${errors}"><span th:text="${error}"></span></li>
             </ul>
         </div>
 
-        <form method="POST" th:action="${student != null ? '/students/edit' : '/students/create'}">
-            <!-- Hidden ID field (only for edit) -->
-            <input type="hidden" name="id" th:field="*{student?.id}" th:if="${student != null}" />
-
+        <!-- FORM FOR CREATING NEW STUDENT -->
+        <form th:if="${student == null || student.id == null || student.id == ''}"
+              method="POST"
+              th:action="@{/students/create}">
+            
             <!-- Student Name -->
             <div class="form-group">
                 <label for="name">Họ và Tên <span style="color: red;">*</span></label>
                 <input type="text" id="name" name="name" placeholder="Nhập họ tên sinh viên" 
-                       th:value="${student != null ? student.name : ''}" required />
-                <div class="error" th:if="${nameError}" th:text="${nameError}"></div>
+                       th:value="${student != null && student.name != null ? student.name : ''}" required />
             </div>
 
             <!-- Email -->
             <div class="form-group">
                 <label for="email">Email <span style="color: red;">*</span></label>
                 <input type="email" id="email" name="email" placeholder="Nhập email (ví dụ: student@example.com)" 
-                       th:value="${student != null ? student.email : ''}" required />
-                <div class="error" th:if="${emailError}" th:text="${emailError}"></div>
+                       th:value="${student != null && student.email != null ? student.email : ''}" required />
                 <div class="form-info">💡 Email phải có định dạng hợp lệ (example@domain.com)</div>
             </div>
 
@@ -173,22 +172,53 @@
             <div class="form-group">
                 <label for="age">Tuổi <span style="color: red;">*</span></label>
                 <input type="number" id="age" name="age" placeholder="Nhập tuổi (1-100)" 
-                       min="1" max="100" th:value="${student != null ? student.age : ''}" required />
-                <div class="error" th:if="${ageError}" th:text="${ageError}"></div>
+                       min="1" max="100" th:value="${student != null && student.age != null ? student.age : ''}" required />
+                <div class="form-info">💡 Tuổi phải nằm trong khoảng 1-100</div>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="button-group">
+                <button type="submit" class="btn-save">➕ Thêm Mới</button>
+                <button type="button" class="btn-cancel" onclick="window.history.back()">❌ Hủy</button>
+            </div>
+        </form>
+
+        <!-- FORM FOR EDITING EXISTING STUDENT -->
+        <form th:if="${student != null && student.id != null && student.id != ''}"
+              method="POST"
+              th:action="@{/students/{id}/edit(id=${student.id})}">
+            
+            <!-- Student Name -->
+            <div class="form-group">
+                <label for="name">Họ và Tên <span style="color: red;">*</span></label>
+                <input type="text" id="name" name="name" placeholder="Nhập họ tên sinh viên" 
+                       th:value="${student.name}" required />
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+                <label for="email">Email <span style="color: red;">*</span></label>
+                <input type="email" id="email" name="email" placeholder="Nhập email (ví dụ: student@example.com)" 
+                       th:value="${student.email}" required />
+                <div class="form-info">💡 Email phải có định dạng hợp lệ (example@domain.com)</div>
+            </div>
+
+            <!-- Age -->
+            <div class="form-group">
+                <label for="age">Tuổi <span style="color: red;">*</span></label>
+                <input type="number" id="age" name="age" placeholder="Nhập tuổi (1-100)" 
+                       min="1" max="100" th:value="${student.age}" required />
                 <div class="form-info">💡 Tuổi phải nằm trong khoảng 1-100</div>
             </div>
 
             <!-- Hidden ID display (for edit mode) -->
-            <div class="form-info" th:if="${student != null}">
+            <div class="form-info">
                 <strong>ID Sinh Viên:</strong> <span th:text="${student.id}"></span> (Không thể thay đổi)
             </div>
 
             <!-- Submit Buttons -->
             <div class="button-group">
-                <button type="submit" class="btn-save">
-                    <span th:if="${student != null}">💾 Cập Nhật</span>
-                    <span th:unless="${student != null}">➕ Thêm Mới</span>
-                </button>
+                <button type="submit" class="btn-save">💾 Cập Nhật</button>
                 <button type="button" class="btn-cancel" onclick="window.history.back()">❌ Hủy</button>
             </div>
         </form>
