@@ -488,11 +488,13 @@ spring.datasource.password=${DB_PASSWORD:postgres}
 
 ### Module 5: View Detail
 > Xem chi tiết thông tin một sinh viên
-![Uploading image.png…]()
+<img width="936" height="919" alt="image" src="https://github.com/user-attachments/assets/a24cf569-bcba-4d6c-b04c-ed74b14a0124" />
+
 
 ### Module 6: Delete Student
 > Xác nhận trước khi xóa sinh viên
-![Uploading image.png…]()
+<img width="681" height="475" alt="image" src="https://github.com/user-attachments/assets/a629dcdc-ff07-45f5-aef6-6e93365d194d" />
+
 
 ---
 
